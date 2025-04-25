@@ -11,19 +11,8 @@ import { analyzeImage } from "./actions"
 
 
 export default function ImageAnalyzer() {
-    // async function uploadToS3(file: File): Promise<string> {
-    //     const res = await fetch(`/api/get-presigned-url?fileType=${file.type}`);
-    //     const { signedUrl, publicUrl } = await res.json();
 
-    //     await fetch(signedUrl, {
-    //         method: "PUT",
-    //         headers: { "Content-Type": file.type },
-    //         body: file,
-    //     });
-
-    //     return publicUrl;
-    // }
-    async function compressAndConvertToBase64(file: File, maxWidth = 512, maxHeight = 512, quality = 0.7): Promise<string> {
+    async function compressAndConvertToBase64(file: File, maxWidth = 1080, maxHeight = 1080, quality = 0.9): Promise<string> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
