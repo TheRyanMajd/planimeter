@@ -1,6 +1,4 @@
 "use client"
-
-import heic2any from "heic2any";
 import type React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -132,10 +130,21 @@ export default function ImageAnalyzer() {
 
         let convertedFile = file;
 
-        if (file.type === "image/heic" || file.name.endsWith(".heic") || file.name.endsWith(".HEIC")) {
+        if (
+            file.type === "image/heic" ||
+            file.name.endsWith(".heic") ||
+            file.name.endsWith(".HEIC")
+        ) {
             try {
-                const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
-                convertedFile = new File([blob as BlobPart], file.name.replace(/\.heic/i, ".jpg"), { type: "image/jpeg" });
+                const heic2any = (await import("heic2any")).default;
+                const blob = await heic2any({
+                    blob: file,
+                    toType: "image/jpeg",
+                    quality: 0.9,
+                });
+                convertedFile = new File([blob as BlobPart], file.name.replace(/\.heic/i, ".jpg"), {
+                    type: "image/jpeg",
+                });
             } catch (err) {
                 console.error("HEIC conversion failed:", err);
                 alert("Sorry, we couldn't convert your HEIC image. Please try a different file.");
@@ -151,6 +160,7 @@ export default function ImageAnalyzer() {
         };
         reader.readAsDataURL(convertedFile);
     };
+
 
     // Handle file upload button click
     const triggerFileUpload = () => {
