@@ -1,12 +1,13 @@
 "use client"
 
-import type React from "react"
+import heic2any from "heic2any";
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { Camera, ImageIcon, Loader2, RefreshCw, Send } from "lucide-react"
-import { useRef, useState } from "react"
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { Camera, ImageIcon, Loader2, RefreshCw, Send } from "lucide-react";
+import { useRef, useState } from "react";
 // import { analyzeImage } from "./api/analyze-image/actions" vercel no likey
 
 
@@ -125,17 +126,31 @@ export default function ImageAnalyzer() {
     }
 
     // Handle file selection
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (file) {
-            setImageFile(file)
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setImagePreview(e.target?.result as string)
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        let convertedFile = file;
+
+        if (file.type === "image/heic" || file.name.endsWith(".heic") || file.name.endsWith(".HEIC")) {
+            try {
+                const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+                convertedFile = new File([blob as BlobPart], file.name.replace(/\.heic/i, ".jpg"), { type: "image/jpeg" });
+            } catch (err) {
+                console.error("HEIC conversion failed:", err);
+                alert("Sorry, we couldn't convert your HEIC image. Please try a different file.");
+                return;
             }
-            reader.readAsDataURL(file)
         }
-    }
+
+        setImageFile(convertedFile);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(convertedFile);
+    };
 
     // Handle file upload button click
     const triggerFileUpload = () => {
@@ -250,7 +265,7 @@ export default function ImageAnalyzer() {
                         </Button>
                     </div>
 
-                    <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                    <input type="file" ref={fileInputRef} accept="image/*,.heic,.heif" onChange={handleFileChange} className="hidden" />
                 </Card>
             )}
 
