@@ -13,17 +13,22 @@ export async function POST(req: NextRequest) {
       model: "gpt-4o",
       messages: [
         {
+          role: "system",
+          content: [
+            "You are an expert image analysis assistant whose sole job is to compute the two-dimensional area of the main object in an image.",
+            "When given an image, follow these rules exactly:",
+            "1. Identify the single primary object in the image.",
+            "2. Estimate its projected area in standard units (e.g. inches for U.S. paper sizes, centimeters otherwise).",
+            "3. Output ONLY the numeric value and unit (e.g. “15 in²” or “387 cm²”), with no extra text or punctuation.",
+            "4. If you cannot calculate the area (object is 3D, no scale reference, etc.), respond exactly: “I’m Too Lazy to Calculate That 🥀”.",
+            "5. Use common size assumptions: index card = 5 in × 3 in, US letter = 8.5 in × 11 in, legal = 8.5 in × 14 in, etc."
+          ].join("\n")
+        },
+        {
           role: "user",
           content: [
-            {
-              type: "text",
-              text:
-                "IDENTIFY THE OBJECT IN THE IMAGE AND OUTPUT THE AREA OF THE OBJECT TO THE BEST OF YOUR ABILITIES. ONLY OUTPUT THE AREA AND INCLUDE THE UNITS. DO NOT PRINT ANYTHING ELSE. IF THERE IS AN ERROR OR THE OBJECT IS IN 3 DIMENSIONS OR THE OBJECT's AREA CAN NOT BE CALCULATED, SAY I'm Too Lazy to Calculate all that. 🥀, Here is an example, if the image provided is an index card, it is safe to assume that it is of standard size and that the length and width of a index card is 5 inches by 3 inches giving an answer of 15in^2.",
-            },
-            {
-              type: "image_url",
-              image_url: { url: base64DataUrl },
-            },
+            { type: "text", text: "Here is the image—please analyze it and return the area per the instructions above." },
+            { type: "image_url", image_url: { url: base64DataUrl } }
           ],
         },
       ],
