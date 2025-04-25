@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Camera, ImageIcon, Loader2, RefreshCw, Send } from "lucide-react"
 import { useRef, useState } from "react"
-import { analyzeImage } from "./actions"
+// import { analyzeImage } from "./api/analyze-image/actions" vercel no likey
 
 
 export default function ImageAnalyzer() {
@@ -144,6 +144,16 @@ export default function ImageAnalyzer() {
         fileInputRef.current?.click()
     }
 
+    async function analyzeImageClient(base64DataUrl: string): Promise<string> {
+        const res = await fetch("/api/analyze-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64DataUrl }),
+        });
+
+        const data = await res.json();
+        return data.result;
+    }
 
 
     const handleAnalyze = async () => {
@@ -153,7 +163,7 @@ export default function ImageAnalyzer() {
 
         try {
             const base64 = await compressAndConvertToBase64(imageFile);
-            const analysisResult = await analyzeImage(base64); // update to use base64
+            const analysisResult = await analyzeImageClient(base64);
             setResult(analysisResult);
         } catch (error) {
             console.error("Image analysis failed:", error);

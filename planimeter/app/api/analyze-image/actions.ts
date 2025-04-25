@@ -1,5 +1,3 @@
-"use server"
-
 // import { revalidatePath } from "next/cache";
 import OpenAI from "openai";
 const client = new OpenAI({
